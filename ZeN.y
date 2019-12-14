@@ -8,7 +8,7 @@ extern int yylineno;
 %start program
 %%
 program: SOURCE LIB END_LIB FUNC END_FUNC COL END_COL DECL END_DECL ACT END_ACT END_SOURCE {printf("program corect sintactic\n");}
-     | SOURCE LIB END_LIB FUNC END_FUNC DECL END_DECL ACT END_ACT END_SOURCE
+     | SOURCE LIB END_LIB FUNC END_FUNC DECL END_DECL ACT END_ACT END_SOURCE {printf("program corect sintactic\n");}
      ;
 
 int yyerror(char * s){
