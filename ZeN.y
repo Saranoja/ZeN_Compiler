@@ -4,45 +4,13 @@ extern FILE* yyin;
 extern char* yytext;
 extern int yylineno;
 %}
-%token ID TIP BGIN END ASSIGN NR 
-%start progr
+%token SOURCE LIB FUNC COL DECL ACT END_SOURCE END_LIB END_FUNC END_COL END_DECL END_ACT TYPE VAR_NAME GETS INTEGER
+%start program
 %%
-progr: declaratii bloc {printf("program corect sintactic\n");}
+program: SOURCE LIB END_LIB FUNC END_FUNC COL END_COL DECL END_DECL ACT END_ACT END_SOURCE {printf("program corect sintactic\n");}
+     | SOURCE LIB END_LIB FUNC END_FUNC DECL END_DECL ACT END_ACT END_SOURCE
      ;
 
-declaratii :  declaratie ';'
-	   | declaratii declaratie ';'
-	   ;
-declaratie : TIP ID 
-           | TIP ID '(' lista_param ')'
-           | TIP ID '(' ')'
-           ;
-lista_param : param
-            | lista_param ','  param 
-            ;
-            
-param : TIP ID
-      ; 
-      
-/* bloc */
-bloc : BGIN list END  
-     ;
-     
-/* lista instructiuni */
-list :  statement ';' 
-     | list statement ';'
-     ;
-
-/* instructiune */
-statement: ID ASSIGN ID
-         | ID ASSIGN NR  		 
-         | ID '(' lista_apel ')'
-         ;
-        
-lista_apel : NR
-           | lista_apel ',' NR
-           ;
-%%
 int yyerror(char * s){
 printf("eroare: %s la linia:%d\n",s,yylineno);
 }

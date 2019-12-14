@@ -17,8 +17,8 @@
 "</declarations>" {return END_DECL;}
 "</actions>" {return END_ACT;}
 @[_a-zA-Z][_a-zA-Z0-9]* {return VAR_NAME;}
-"=" {return ASSIGN;}
-[0-9]+ {return NUMBER;}
+"=" {return GETS;}
+[0-9]+ {return INTEGER;}
 [ \t] ;
 \n {yylineno++;}
 . {return yytext[0];}
