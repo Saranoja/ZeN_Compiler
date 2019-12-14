@@ -1,0 +1,107 @@
+<source_code>
+
+<libraries>
+@export /*write*/
+@calculus
+@matrix
+@collections
+@string
+</libraries>
+
+<functions>
+Eval(int parameter)
+{
+	return 10;
+}
+add(int x, int y)
+{
+	return x+y;
+}
+mul(float x, float y)
+{
+	return x*y;
+}
+</functions>
+
+<collections>
+square(length)
+{
+	square::length;
+	int area=mul(length,length);
+}
+cube(x):square
+{
+	cube::x;
+	square side(x);
+	int volume=mul(side.area,x);
+	string colour="blue";
+	string size="small";
+}
+</collections>
+
+<declarations>
+int a;
+int b=5;
+int sum;
+int result;
+int pos;
+int index;
+float c;
+float d=12.5;
+char first[20];
+char second="Compiler";
+char name[100];
+string something;
+string another;
+array arr[10];
+matrix mtx[3][3];
+square number_one(3);
+cube number_two(4);
+</declarations>
+
+<actions>
+a=7;
+sum=a+b;
+write(sum);
+c=2.5;
+result=c*d; /*should generate an error*/
+first="ZeN";
+name=first#second; /*concat function*/
+something="Banana";
+another="a";
+pos=find(something, another); /*searches for another in something adn returns index if found*/
+arr=[1 2 3 4];
+mtx=[1 2 3; 4 5 6; 7 8 9];
+write(number_one.area);
+write(number_two.volume);
+write(Eval(c));
+
+if(a<sum)
+{
+	a++;
+	b++;
+}
+else
+{
+	++sum;
+}
+
+a=7;
+b=2;
+
+while(b!=a && a>0)
+{
+	b=add(b,1);
+	a--;
+}
+
+sum=0;
+
+for(index=0;index<=10;index++)
+{
+	sum+=index;
+}
+write(sum);
+</actions>
+
+</source_code>
