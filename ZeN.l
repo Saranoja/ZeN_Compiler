@@ -22,16 +22,25 @@
 "</collections>" {return END_COL;}
 "</declarations>" {return END_DECL;}
 "</actions>" {return END_ACT;}
-"+"|"-"|"*"|"/" {return OP;}
+"+"|"-"|"*"|"/"|"%" {return OP;}
 "&&"|"||" {return LOGIC_OP;}
 "<"|">"|"=="|"<="|">=" {return COMP;}
 "!" {return NOT;}
+"++" {return INCREMENT;}
+"--" {return DECREMENT;}
+"+=" {return ADD;}
+"-=" {return DECREASE;}
+"*=" {return MULTIPLY;}
+"/=" {return DIVIDE;}
 "true"|"false" {return TRUTH_VALUE;}
 "return" {return RET;}
+"for" {return FOR;}
+"if" {return IF;}
+"while" {return WHILE;}
 @[_a-zA-Z][_a-zA-Z0-9]* {return LIB_NAME;}
 [_a-zA-Z][_a-zA-Z0-9]* {return VAR_NAME;}
 [_a-zA-Z][_a-zA-Z0-9]* {return OBJ_NAME;}
-[ _a-zA-Z][_ a-zA-Z0-9]* {return TEXT;}
+\"[ _a-zA-Z][_ a-zA-Z0-9]*\" {return TEXT;}
 "=" {return GETS;}
 [0-9]+ {return NUMBER;}
 ([1-9][0-9]*\.[0-9]+)|(0\.[0-9]+) {return NR_FLOAT;}
