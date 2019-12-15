@@ -3,7 +3,10 @@
 #include "y.tab.h"
 %}
 %%
-"int"|"float"|"char"|"string" {return TYPE;}
+"int" {return INT;}
+"float" {return FLOAT;}
+"char" {return CHAR;}
+"string" {return STRING;}
 "<source_code" {return SOURCE;}
 "<libraries>" {return LIB;}
 "<functions>" {return FUNC;}
@@ -18,8 +21,8 @@
 "</actions>" {return END_ACT;}
 @[_a-zA-Z][_a-zA-Z0-9]* {return VAR_NAME;}
 "=" {return GETS;}
-[0-9]+ {return INTEGER;}
-([1-9][0-9]*\.[0-9]+)|(0\.[0-9]+) {return NRF;}
+[0-9]+ {return NUMBER;}
+([1-9][0-9]*\.[0-9]+)|(0\.[0-9]+) {return NR_FLOAT;}
 [ \t] ;
 \n {yylineno++;}
 . {return yytext[0];}
