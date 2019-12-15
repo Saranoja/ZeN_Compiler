@@ -7,6 +7,9 @@
 "float" {return FLOAT;}
 "char" {return CHAR;}
 "string" {return STRING;}
+"bool" {return BOOL;}
+"array" {return ARRAY;}
+"matrix" {return MATRIX;}
 "<source_code" {return SOURCE;}
 "<libraries>" {return LIB;}
 "<functions>" {return FUNC;}
@@ -19,7 +22,16 @@
 "</collections>" {return END_COL;}
 "</declarations>" {return END_DECL;}
 "</actions>" {return END_ACT;}
-@[_a-zA-Z][_a-zA-Z0-9]* {return VAR_NAME;}
+"+"|"-"|"*"|"/" {return OP;}
+"&&"|"||" {return LOGIC_OP;}
+"<"|">"|"=="|"<="|">=" {return COMP;}
+"!" {return NOT;}
+"true"|"false" {return TRUTH_VALUE;}
+"return" {return RET;}
+@[_a-zA-Z][_a-zA-Z0-9]* {return LIB_NAME;}
+[_a-zA-Z][_a-zA-Z0-9]* {return VAR_NAME;}
+[_a-zA-Z][_a-zA-Z0-9]* {return OBJ_NAME;}
+[ _a-zA-Z][_ a-zA-Z0-9]* {return TEXT;}
 "=" {return GETS;}
 [0-9]+ {return NUMBER;}
 ([1-9][0-9]*\.[0-9]+)|(0\.[0-9]+) {return NR_FLOAT;}

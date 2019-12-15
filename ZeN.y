@@ -4,44 +4,68 @@ extern FILE* yyin;
 extern char* yytext;
 extern int yylineno;
 %}
-%token SOURCE END_SOURCE LIB END_LIB FUNC END_FUNC COL END_COL DECL END_DECL ACT END_ACT TYPE VAR_NAME GETS INTEGER FLOAT
+%token SOURCE END_SOURCE LIB END_LIB FUNC END_FUNC COL END_COL DECL END_DECL ACT END_ACT OBJ_NAME
+%token LIB_NAME GETS NUMBER NUMBER_FLOAT INT CHAR STRING BOOL FLOAT VAR_NAME OP LOGIC_OP COMP NOT TRUTH_VALUE MATRIX ARRAY
 %start program
 %%
 program: SOURCE list_code END_SOURCE {printf("program corect sintactic\n");}
        ;
 
-list_code: LIB list_lib END_LIB functions
+list_code: libraries functions collections declarations actions
 	 ;
 
-list_lib: list_lib VAR_NAME
-	| VAR_NAME	
+libraries: LIB lib_list END_LIB
 	;
+lib_list: LIB_NAME
+		| LIB_NAME lib_list
+		;
 
-functions: FUNC list_function END_FUNC collections declarations
+functions: FUNC list_functions END_FUNC
 	 ;
+list_functions: VAR_NAME '(' function_parameters ')' '{' list_actions '}'
+				| list_functions VAR_NAME '(' function_parameters ')' '{' list_actions '}'
+				;
 
 collections:
 	   | COL list_collections END_COL
 	   ;
 
-declarations: DECL list_declarations END_DECL actions
+declarations: DECL list_declarations END_DECL
 	    ;
-list_declarations: TYPE VAR_NAME assign
-		 ;
-assign: GETS value
-      | '(' value ')'
-      | '[' value ']'
-      | '[' value ']' '[' value ']'
-      ;	
-value: INTEGER
-     | FLOAT
-     | 
-     ;
+list_declarations: INT VAR_NAME ';'
+			| FLOAT VAR_NAME ';'
+			| FLOAT VAR_NAME GETS VAR_NAME ';'
+			| CHAR VAR_NAME '[' NUMBER ']' ';'
+			| STRING VAR_NAME ';'
+			| BOOL VAR_NAME ';'
+			| ARRAY VAR_NAME '[' NUMBER ']' ';'
+			| MATRIX VAR_NAME '[' NUMBER ']' '[' NUMBER ']' ';'
+			| OBJ_NAME VAR_NAME '(' parameters ')' ';'
+			;
 
 
-actions : ACT list_actions END_ACT
+actions: ACT list_actions END_ACT
 	;	
+list_actions: list_actions action | action;
 
+action: if_statement | while_statement | for_statement | RET equation
+		| VAR_NAME GETS equation
+		;
+
+equation: operand
+		| operand OP operand
+		| equation OP operand
+		;
+
+operand: VAR_NAME | NUMBER | NUMBER_FLOAT ;
+
+if_statement: 
+			;
+
+for_statement:
+			;
+while_statement:
+				;
 
 %%
 int yyerror(char * s){
