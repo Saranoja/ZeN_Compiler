@@ -19,6 +19,7 @@
 @[_a-zA-Z][_a-zA-Z0-9]* {return VAR_NAME;}
 "=" {return GETS;}
 [0-9]+ {return INTEGER;}
+([1-9][0-9]*\.[0-9]+)|(0\.[0-9]+) {return NRF;}
 [ \t] ;
 \n {yylineno++;}
 . {return yytext[0];}
