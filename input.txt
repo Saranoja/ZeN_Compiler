@@ -1,7 +1,7 @@
 <source_code>
 
 <libraries>
-@export /*write*/
+@export
 @calculus
 @matrix
 @collections
@@ -11,7 +11,7 @@
 <functions>
 Eval(int parameter)
 {
-	return 10;
+	return result;
 }
 add(int x, int y)
 {
@@ -27,29 +27,31 @@ mul(float x, float y)
 square(length)
 {
 	square::length;
+	string colour;
 	int area=mul(length,length);
 }
-cube(x):square
+cube(x)
 {
 	cube::x;
 	square side(x);
-	int volume=mul(side.area,x);
-	string colour="blue";
-	string size="small";
+	string colour;
+	string size;
+	int volume=mul(side->area,x);
 }
 </collections>
 
 <declarations>
 int a;
-int b=5;
+int b;
+bool ok;
 int sum;
 int result;
 int pos;
 int index;
 float c;
-float d=12.5;
+float d;
 char first[20];
-char second="Compiler";
+char second[30];
 char name[100];
 string something;
 string another;
@@ -61,30 +63,34 @@ cube number_two(4);
 
 <actions>
 a=7;
+b=5;
+ok=true;
 sum=a+b;
 write(sum);
 c=2.5;
-result=c*d; /*should generate an error*/
+d=12.5;
+result=c*d;
 first="ZeN";
-name=first#second; /*concat function*/
+second="Compiler";
+name=concat(first,second);
 something="Banana";
 another="a";
-pos=find(something, another); /*searches for another in something adn returns index if found*/
+pos=find(something, another);
 arr=[1 2 3 4];
 mtx=[1 2 3; 4 5 6; 7 8 9];
-write(number_one.area);
-write(number_two.volume);
-write(Eval(c));
+write(number_one->area);
+write(number_two->volume);
+write(Eval(a+c));
 
 if(a<sum)
 {
-	a++;
-	b++;
+	a=a+1;
+	b=b+1;
 }
 else
 {
-	++sum;
-}
+	sum=sum+1;
+};
 
 a=7;
 b=2;
@@ -92,15 +98,15 @@ b=2;
 while(b!=a && a>0)
 {
 	b=add(b,1);
-	a--;
-}
+	a=a-1;
+};
 
 sum=0;
 
-for(index=0;index<=10;index++)
+for(index=0;index<=10;index=index+1)
 {
-	sum+=index;
-}
+	sum=sum+index;
+};
 write(sum);
 </actions>
 
