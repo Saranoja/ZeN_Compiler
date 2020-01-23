@@ -1,113 +1,103 @@
-<source_code>
-
-<libraries>
-@export
-@calculus
-@matrix
-@collections
-@string
-</libraries>
-
-<functions>
-Eval(int parameter)
+<class> object a 
 {
-	return result;
+   attribute int *valoare.
+   attribute string nume = "RRadu".
+   attribute bool flag.
+   attribute int *valoare.
+   attribute char *c = 'c'.
+   attribute array arr1 = [].
+   attribute array arr2 = [12, "cuvant", iden].
 }
-add(int x, int y)
+
+<function> char functie1 ( int argument1, char arg2)
 {
-	return x+y;
+    
 }
-mul(float x, float y)
+
+<function> string olariu( string argument1, int n, int a, string k)
 {
-	return x*y;
+   <function_call> Eval (6 - 10 * 5 / 5 ) 
 }
-</functions>
 
-<collections>
-square(length)
+
+<function_call> functie2(int a)
+
+<function> string functie2(string argument1, int n)
 {
-	square::length;
-	string colour;
-	int area=mul(length,length);
+   
+   <function_call> olariu(string banana, int cve, char fgn)
+   <function_call> olariu (char v, int tema, string cv)
+   <function_call> abracadabra(int a)
+   function_member int nr.
+   function_member nr = 50.
+   function_member int smth = 10.
+   <function_call> Eval (function_member int nr = 9. - function_member int smth = 18. )
+
 }
-cube(x)
+
+<function_call> functie2(int a)
+
+<function> int functie (int *a, string dar)
 {
-	cube::x;
-	square side(x);
-	string colour;
-	string size;
-	int volume=mul(side->area,x);
+   <function_call> functie2 (string one)
 }
-</collections>
 
-<declarations>
-int a;
-int b;
-bool ok;
-int sum;
-int result;
-int pos;
-int index;
-float c;
-float d;
-char first[20];
-char second[30];
-char name[100];
-string something;
-string another;
-array arr[10];
-matrix mtx[3][3];
-square number_one(3);
-cube number_two(4);
-</declarations>
-
-<actions>
-a=7;
-b=5;
-ok=true;
-sum=a+b;
-write(sum);
-c=2.5;
-d=12.5;
-result=c*d;
-first="ZeN";
-second="Compiler";
-name=concat(first,second);
-something="Banana";
-another="a";
-pos=find(something, another);
-arr=[1 2 3 4];
-mtx=[1 2 3; 4 5 6; 7 8 9];
-write(number_one->area);
-write(number_two->volume);
-write(Eval(a+c));
-
-if(a<sum)
+<function> int functie2 (int a, string q)
 {
-	a=a+1;
-	b=b+1;
+   <function_call> olariu( string argument1, int n, int a, string k)
 }
-else
+
+<function> int functie2 (int a, string b)
 {
-	sum=sum+1;
-};
+}
 
-a=7;
-b=2;
-
-while(b!=a && a>0)
+<function> int functie2 (int a, bool b)
 {
-	b=add(b,1);
-	a=a-1;
-};
+}
 
-sum=0;
-
-for(index=0;index<=10;index=index+1)
+<function> int functie4 (int a)
 {
-	sum=sum+index;
-};
-write(sum);
-</actions>
+   function_member int k.
+   function_member int k.
+   function_member int a = 5.
+   function_member abc = 6.
+   function_member b = 12 + a.
+  
+   function_member string nume = "RRadu".
 
-</source_code>
+    if ( a < 5 || true )
+    {
+
+      function_member int a.
+      function_member int b.
+    
+      function_member int abc.
+
+      function_member string str1 = "cuvant1".
+      function_member string str2 = "cuvant2".
+      function_member string str3.
+      function_member str3 = str1 + str2.
+
+      function_member abc = 123.
+
+      function_member int i.
+
+      function_member int Inaintedefor.
+
+        if ( false && abc == 3 )
+        {
+            for ( function_member i = 2. i <= 10 . function_member i = i + 1. )
+            {
+              
+               function_member a = a * 2.
+           }
+       }
+       else
+        {
+            while( a >= 2 )
+            {
+               function_member a = a + 1.
+            }
+       }
+  }
+}
