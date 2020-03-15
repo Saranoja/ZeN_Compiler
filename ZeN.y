@@ -1,136 +1,285 @@
 %{
 #include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include "ZeN.h"
+
 extern FILE* yyin;
 extern char* yytext;
 extern int yylineno;
+extern char* yytext;
+
 %}
-%token SOURCE END_SOURCE LIB END_LIB FUNC END_FUNC COL END_COL DECL END_DECL ACT END_ACT TEXT
-%token LIB_NAME GETS NUMBER NR_FLOAT INT CHAR STRING BOOL FLOAT VAR_NAME OP LOGIC_OP COMP NOT TRUTH_VALUE MATRIX ARRAY RET
-%token ADD DECREASE MULTIPLY DIVIDE FOR IF WHILE INCREMENT DECREMENT ELSE OBJ_NAME
-%start program
+%union {
+  int intVal; //valoarea
+  char* dataType; // tipul de data
+  char* strVal; //numele (id-ul)
+  char *key;
+}
+
+%token STRINGVAL  CHARVAL BEG END ANS  TRUE FALSE EVAL WHILE FOR IF ELSE BOOLEQ BOOLGEQ BOOLLEQ BOOLNEQ LOGICALAND LOGICALOR  DECLF FCALL RETURN  BOOLGE BOOLLE EQ OBJCALL OBJTYPE
+%token <dataType> INTTYPE BOOLTYPE STRINGTYPE ARRAYTYPE  CHARTYPE VOID
+%token <intVal> NR
+%token <strVal> ID
+%token <key>  DECL ODECL
+
+%type <intVal> exp e 
+
+%start s
+%left PLUS MINUS
+%left MUL DIV
 %%
-program: SOURCE list_code END_SOURCE {printf("program corect sintactic\n");}
+
+s: progr {printf ("\n Limbajul este corect sintactic.\n"); printTable(); Scrie();}
+
+progr : declarations functions
+
+depthAdd  : { curentDepthAdd(); }
+          ;
+
+declarations : objects
+             |
+             ;
+
+objects : objects object
+        | object
+        ;
+
+object : OBJCALL depthAdd OBJTYPE ID BEG  atributelist objEnd 
+       | OBJCALL depthAdd OBJTYPE ID BEG objEnd
        ;
 
-list_code: libraries functions collections declarations actions
-	 ;
+objEnd    : END { curentDepthDec(); }
+          ;
 
-basic_type: INT | FLOAT | CHAR | STRING | BOOL
-	;
+atributelist : atributelist atribute
+             | atribute
+             ;
 
-libraries: LIB lib_list END_LIB
-	;
-lib_list: LIB_NAME
-		| LIB_NAME lib_list
-		;
+atribute : DECL INTTYPE ID EQ NR'.' {insert($1,$2,$3,$5);}
+         | DECL INTTYPE ID'.'       {insert($1, $2, $3, 2147483647);}
+         | DECL CHARTYPE ID  EQ CHARVAL'.'{insert($1, $2, $3, -1);}
+         | DECL CHARTYPE ID'.'        {insert($1, $2, $3, -1);}
+         | DECL STRINGTYPE ID  EQ STRINGVAL'.'{insert($1, $2, $3, -1);}
+         | DECL STRINGTYPE ID'.'{insert($1, $2, $3, -1);}
+         | DECL BOOLTYPE ID EQ TRUE'.'{insert($1, $2, $3, 1);}
+         | DECL BOOLTYPE ID EQ FALSE'.'{insert($1, $2, $3, 0);}
+         | DECL BOOLTYPE ID'.'{insert($1,$2,$3,-1);}
+         | DECL ARRAYTYPE ID EQ arraylist'.'{insert($1, $2, $3, -1);}
+         //| DECL OBJTYPE ID object'.'{insert($1, $2, $3, -1);}
+         //| DECL OBJTYPE ID'.'{insert($1, $2, $3, -1);}
+         | FCALL  EVAL '(' exp ')'
+         | FCALL ID '(' callInstructions ')'  {    insertName($2);
+                                                   if (checkIdentity($2)==0)
+                                                       printf("Tipurile functiei apelate nu coincid cu tipurile functiei declarate pentru functia %s \n", $2);
+                                             }
+         | ODECL INTTYPE ID EQ NR'.' {insert($1, $2, $3, $5);}
+         | ODECL INTTYPE ID'.'{insert($1, $2, $3, 2147483647);}
+         | ODECL CHARTYPE ID  EQ CHARVAL'.'{insert($1, $2, $3, -1);}
+         | ODECL CHARTYPE ID'.'{insert($1, $2, $3, -1);}
+         | ODECL STRINGTYPE ID  EQ STRINGVAL'.'{insert($1, $2, $3, -1);}
+         | ODECL STRINGTYPE ID'.'{insert($1, $2, $3, -1);}
+         | ODECL BOOLTYPE ID EQ TRUE'.'{insert($1, $2, $3, 1);}
+         | ODECL BOOLTYPE ID EQ FALSE'.'{insert($1, $2, $3, 0);}
+         | ODECL BOOLTYPE ID'.' {insert($1,$2,$3,-1);}
+         | ODECL ARRAYTYPE ID EQ arraylist'.'{insert($1, $2, $3, -1);}
+        // | ODECL OBJTYPE ID object'.'{insert($1, $2, $3, -1);}
+        // | ODECL OBJTYPE ID'.'{insert($1, $2, $3, -1);}
+         | ODECL INTTYPE EVAL '(' exp ')'
+         ;
 
-functions: FUNC list_functions END_FUNC
-	 ;
-list_functions: VAR_NAME '(' function_parameters ')' '{' list_actions '}'
-				| list_functions VAR_NAME '(' function_parameters ')' '{' list_actions '}'
-				;
-function_parameters: basic_type VAR_NAME
-				| basic_type VAR_NAME ',' function_parameters
-				| basic_type OBJ_NAME
-				| basic_type OBJ_NAME ',' function_parameters
-				;
+arraylist : '['']'
+          | '['list']'
+          ;
 
-collections:
-	   | COL list_collections END_COL
-	   ;
-list_collections: VAR_NAME '(' VAR_NAME ')' '{' class_components '}'
-				| VAR_NAME '(' VAR_NAME ')' ':' VAR_NAME '{' class_components '}'
-				| list_collections list_collections
-				;
-class_components: class_components component
-				| component
-				;
-component: list_declarations
-		| constructor
-		| assignment ';'
-		;
-constructor: VAR_NAME ':' ':' VAR_NAME ';'
-		;
-construct_parameters: NUMBER | NR_FLOAT	| TEXT | VAR_NAME
-					;
+list : list',' listval
+     | listval
+     ;
 
-declarations: DECL list_declarations END_DECL
-	    ;
-assignment: basic_type VAR_NAME GETS equation
-		| ARRAY VAR_NAME '[' NUMBER ']' GETS '[' arr_values ']'
-		| MATRIX VAR_NAME '[' NUMBER ']' '[' NUMBER ']' GETS '[' matrix_values ']'
-		| basic_type OBJ_NAME GETS equation
-		| basic_type VAR_NAME GETS function_call
-		;
-arr_values: NUMBER
-		| NUMBER arr_values
-		;
-matrix_values: arr_values
-		| arr_values ';' matrix_values
-		;
+listval : NR
+        | CHARVAL
+        | STRINGVAL
+        | ID
+        | object
+        | arraylist
+        ;
 
-list_declarations: INT VAR_NAME ';'
-			| FLOAT VAR_NAME ';'
-			| FLOAT VAR_NAME GETS VAR_NAME ';'
-			| CHAR VAR_NAME '[' NUMBER ']' ';'
-			| STRING VAR_NAME ';'
-			| BOOL VAR_NAME ';'
-			| ARRAY VAR_NAME '[' NUMBER ']' ';'
-			| MATRIX VAR_NAME '[' NUMBER ']' '[' NUMBER ']' ';'
-			| VAR_NAME VAR_NAME '(' construct_parameters ')' ';'
-			| INT VAR_NAME GETS function_call ';'
-			| FLOAT VAR_NAME GETS function_call ';'
-			| CHAR VAR_NAME GETS function_call ';'
-			| STRING VAR_NAME GETS function_call ';'
-			| list_declarations list_declarations
-			;
+functions : functions  function
+          | function
+          ;
+function  : DECLF INTTYPE ID    depthAdd functionBody { insertIntoFsignature($2); insertIntoFsignature($3); insertIntoNameArray($3); insertFct();}
+          | DECLF CHARTYPE ID   depthAdd functionBody { insertIntoFsignature($2); insertIntoFsignature($3); insertIntoNameArray($3); insertFct();}
+          | DECLF VOID ID       depthAdd functionBody { insertIntoFsignature($2); insertIntoFsignature($3); insertIntoNameArray($3); insertFct();}
+          | DECLF BOOLTYPE ID   depthAdd functionBody { insertIntoFsignature($2); insertIntoFsignature($3); insertIntoNameArray($3); insertFct();}
+          | DECLF STRINGTYPE ID depthAdd functionBody { insertIntoFsignature($2); insertIntoFsignature($3); insertIntoNameArray($3); insertFct();}
+          | DECLF INTTYPE EVAL '(' exp ')'
+          | FCALL ID '(' callInstructions')' {    insertName($2);
+                                                   if (!checkIdentity($2))
+                                                       printf("Tipurile functiei apelate nu coincid cu tipurile functiei declarate pentru functia %s \n", $2);
+                                             }
+          ;
 
-actions: ACT list_actions END_ACT
-	;	
-list_actions: action ';' list_actions
-			| action ';'
-			;
+functionBody   : '(' declInstructions ')' body
+               ;
 
-action: if_statement | while_statement | for_statement | RET equation | function_call
-		| VAR_NAME GETS equation
-		| VAR_NAME GETS TRUTH_VALUE
-		;
+callInstructions    : callInstructions ',' callInstruction
+                    | callInstruction
+                    ;
 
-equation: operand
-		| operand OP operand
-		| equation OP operand
-		| NR_FLOAT | NUMBER
-		;
+callInstruction     : INTTYPE ID {insertIntoUserArray($1);}
+                    | CHARTYPE ID {insertIntoUserArray($1);}
+                    | STRINGTYPE ID {insertIntoUserArray($1);}
+                    | BOOLTYPE ID {insertIntoUserArray($1);}
+                    | function      
+                    | NR {insertIntoUserArray("int");}
+                    ;
 
-operand: VAR_NAME | OBJ_NAME | NUMBER | NR_FLOAT | TEXT | function_call | '[' arr_values ']' | '[' matrix_values ']' ;
-function_call: VAR_NAME '(' parameters ')'
-			;
-parameters: operand ',' parameters
-		| operand
-		| equation
-		;
+declInstructions    : declInstructions ',' declInstruction
+                    | declInstruction
+                    ;
 
-if_statement: IF '(' logicals ')' '{' list_actions '}'
-			| IF '(' logicals ')' '{' list_actions '}' ELSE '{' list_actions '}'
-			;
+declInstruction     : INTTYPE ID    {  insertTEMP($1); insertIntoParamArray($1);}
+                    | CHARTYPE ID   {  insertTEMP($1); insertIntoParamArray($1);}
+                    | STRINGTYPE ID {  insertTEMP($1); insertIntoParamArray($1);}
+                    | BOOLTYPE ID   {  insertTEMP($1); insertIntoParamArray($1);}
+                    ;
 
-for_statement: FOR '(' VAR_NAME GETS operand';' VAR_NAME COMP operand ';' VAR_NAME GETS equation ')' '{' list_actions '}'
-			;
-while_statement: WHILE '(' logicals ')' '{' list_actions '}'
-				;
 
-logicals: logical
-		| logicals LOGIC_OP logical
-		;
+exp       : e  {$$=$1; printf("Valoarea expresiei este %d\n",$$);} 
+          ;
 
-logical: operand COMP operand
+e : e PLUS e   {$$=$1+$3; }
+  | e MINUS e   {$$=$1-$3; }
+  | e MUL e   {$$=$1*$3; }
+  | e DIV e   {$$=$1/$3; }
+  | NR {$$=$1; }
+  | DECL INTTYPE ID EQ NR'.' { int i; 
+                              if((i=lookup($3)) != -1)
+                              { 
+                                   updateVarWith_value($3, $5);
+                                   $$ =  symTable[i].Value ;
+                                   
+                              }
+                              else {
+                                   printf("Variabila nu exita! \n"); 
+                                   printf("Din cauza ca ai dat ca argument la funtia Eval o variabila care nu exista acest program va crapa!\n");
+                                   printf("O zi buna!\n");
+                                   exit(1);
+                              }
+                              }
+  | DECL INTTYPE ID'.' { int i;
+                         if((i=lookup($3)) != -1)
+                         {   
+                              $$= symTable[i].Value;
+                         }
+                          else 
+                          {
+                              printf("Variabila nu exita!\n"); 
+                              printf("Din cauza ca ai dat ca argument la functia Eval o variabila care nu exista acest program va crapa!\n");
+                              printf("O zi buna!\n");
+                             exit(0);
+                          }
+                        }
+  ;
+
+body      : BEG blockInstructions RETURN bodyEnd
+          | BEG blockInstructions bodyEnd
+          | BEG END
+          ;
+
+bodyEnd   : END { curentDepthDec(); }
+          ;
+
+blockInstructions   : blockInstructions blockInstruction 
+                    | blockInstruction
+                    ;
+
+blockInstruction    : atribute
+                    | assignment
+                    | while
+                    | for
+                    | if
+                    ;
+
+while : WHILE depthAdd '(' conditii ')' body
+      ;
+
+for  : FOR depthAdd '(' assignment conditii '.' assignment ')' body
+     ;
+
+if   : IF depthAdd '(' conditii ')' body
+     | IF depthAdd '(' conditii ')' body ELSE depthAdd body
+     ;
+
+
+assignment : DECL ID EQ NR'.' { updateVarWith_value($2, $4); }
+           | DECL ID EQ CHARVAL'.'
+           | DECL ID EQ STRINGVAL'.'
+           | DECL ID EQ TRUE'.'
+           | DECL ID EQ FALSE'.'
+           | DECL ID EQ arraylist'.'
+           | DECL ID EQ operatie'.' 
+           | DECL ID EQ ID'.' { updateVarWith_id($2, $4); }
+           ;
+
+operatie  : plus
+          | minus
+          | mul
+          | div
+          ;
+
+plus : ID PLUS ID { checkDecl($1); checkDecl($3); }
+     | ID PLUS NR { checkDecl($1);}
+     | NR PLUS ID { checkDecl($3);}
+     ;
+
+minus : ID MINUS ID { checkDecl($1); checkDecl($3); }
+      | ID MINUS NR { checkDecl($1);}
+      | NR MINUS ID { checkDecl($3);}
+      ;
+
+mul  : ID MUL ID { checkDecl($1); checkDecl($3); }
+     | ID MUL NR { checkDecl($1);}
+     | NR MUL ID { checkDecl($3);}
+     ;
+
+div  : ID DIV ID { checkDecl($1); checkDecl($3); }
+     | ID DIV NR { checkDecl($1);}
+     | NR DIV ID { checkDecl($3);}
+     ;
+
+conditii  : conditii logicalOp conditie
+          | conditie
+          ;
+
+logicalOp : LOGICALAND
+          | LOGICALOR
+          ;
+
+conditie  : TRUE
+          | FALSE
+          | NR boolOp NR
+          | ID boolOp NR
+          | NR boolOp ID
+          | ID boolOp ID
+          ;
+
+boolOp    : BOOLEQ
+          | BOOLGEQ
+          | BOOLLEQ
+          | BOOLNEQ
+          | BOOLLE
+          | BOOLGE
+          ;
+
 
 %%
+
 int yyerror(char * s){
-printf("eroare: %s la linia:%d\n",s,yylineno);
+printf("Eroare: %s la linia:%d iar yytext este %s\n",s,yylineno,yytext);
 }
 
 int main(int argc, char** argv){
-yyin=fopen(argv[1],"r");
-yyparse();
-} 
+     yyin=fopen(argv[1],"r");
+     yyparse();
+}
