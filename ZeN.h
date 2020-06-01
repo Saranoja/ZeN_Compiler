@@ -22,7 +22,7 @@ struct symTableElem
      int blockNr;          //index of block in curent depth
      int scope;            // function parameter or block local or for-loop statement etc
      char symbol_type[50]; //int char function object
-     char symbol_name[50]; //id-ul
+     char symbol_name[50]; //id
      int Value;
 };
 struct symTableElem symTable[100];
@@ -34,7 +34,7 @@ int curr = 0;
 int one=0;
 int two=0;
 
-char fsignature[300]; //asta vrea declarat sus
+char fsignature[300];
 char temp[100];
 
 struct all_functions
@@ -68,17 +68,13 @@ int fctIndex = 0;
 int curentDepthAdd()
 {
      blockNrForDepth[curentDepth]++;
-     //printf("se incrementeaza vectorul block cu vlaoarea % d\n", blockNrForDepth[curentDepth]);
      curentDepth++;
-
-     //  printf("       Am crescut adancimea. Acum este %d\n", curentDepth);
      return 0;
 }
 
 int curentDepthDec()
 {
      curentDepth--;
-     // printf("       Am scazut adancimea. Acum este %d\n", curentDepth);
      return 0;
 }
 
@@ -99,8 +95,7 @@ int lookup(char *name)
                    symTable[i].blockNr == lookupBlockNr &&
                    strcmp(symTable[i].symbol_name, name) == 0)
           {
-               // printf("Am fost apelat cu succes\n");
-               return i; //variabila exista deja in tabel;
+               return i; //variable exists
           }
      }
 
@@ -111,13 +106,12 @@ int insert(char *SCOPE, char *type, char *id, int Val)
 {
      if (lookup(id) != -1)
      {
-          printf("  Eroare: variabila %s %s exista deja.\n", type, id);
+          printf("  Error: variabile %s %s has already been declared.\n", type, id);
           return 0;
      }
 
      symTable[varIndex].blockDepth = curentDepth;
      symTable[varIndex].blockNr = blockNrForDepth[curentDepth - 1];
-     //printf(" chuvantul cheie este %s ",SCOPE);
      if (strcmp(SCOPE, "Fprepare") == 0)
      {
           symTable[varIndex].scope = 0;
@@ -129,14 +123,11 @@ int insert(char *SCOPE, char *type, char *id, int Val)
      strcpy(symTable[varIndex].symbol_type, type);
      strcpy(symTable[varIndex].symbol_name, id);
      symTable[varIndex].Value = Val;
-     //printf("      %d %s %s = %d\n",symTable[varIndex].scope,symTable[varIndex].symbol_type,symTable[varIndex].symbol_name,symTable[varIndex].Value );
-     // printf("Am inserat intdex = %d\n", varIndex);
      varIndex++;
      if (varIndex == 100)
      {
-          printf("Eroare: A fost atins numarul maxim de variabile disponibile.\n");
+          printf("Error: you have declared the maximum number of variables.\n");
      }
-     //printf("Inserare cu succes a variabilei %s \n",id );
      return 0;
 }
 
@@ -145,18 +136,18 @@ int checkDecl(char *id)
      int idIndex;
      if ((idIndex = lookup(id)) == -1)
      {
-          printf("  Eroare: variabila %s nu exista\n", id);
+          printf("  Error: variable %s doesn't exist\n", id);
           return 0;
      }
 
      if (strcmp(symTable[idIndex].symbol_type, "int") != 0)
      {
-          printf("  Eroare: variabila %s nu este de tip int.\n", id);
+          printf("  Error: variable %s is not int.\n", id);
           return -1;
 
           if (symTable[idIndex].Value == MAXINT)
           {
-               printf("  Eroare: variabila %s a fost initializata\n", id);
+               printf("  Error: variable %s hasn't been initialized\n", id);
                return -1;
           }
      }
@@ -169,7 +160,7 @@ int updateVarWith_value(char *dest, int source)
 
      if ((destIndex = lookup(dest)) == -1)
      {
-          printf("  Eroare: variabila %s nu exista\n", dest);
+          printf("  Error: variable %s doesn't exist\n", dest);
           return -1;
      }
 
@@ -184,24 +175,24 @@ int updateVarWith_id(char *dest, char *source)
 
      if ((sourceIndex = lookup(source)) == -1)
      {
-          printf("  Eroare: variabila %s nu exista\n", source);
+          printf("  Error: variable %s doesn't exist\n", source);
           return -1;
      }
 
      if ((destIndex = lookup(dest)) == -1)
      {
-          printf("  Eroare: variabila %s nu exista\n", dest);
+          printf("  Error: variable %s doesn't exist\n", dest);
           return -1;
      }
 
      if (strcmp(symTable[sourceIndex].symbol_type, "int") != 0)
      {
-          printf("  Eroare: variabila %s nu este de tip int.\n", dest);
+          printf("  Error: variable %s is not int.\n", dest);
           return -1;
 
           if (symTable[sourceIndex].Value == MAXINT)
           {
-               printf("  Eroare: variabila %s a fost initializata\n", dest);
+               printf("  Error: variable %s hasn't been initialized\n", dest);
                return -1;
           }
      }
@@ -218,7 +209,7 @@ int printTable()
      int lookupDepth = 0;
      int j;
 
-     printf("\n\nTabela de simboluri este:\n");
+     printf("\n\nSymbol table:\n");
      for (i = 0; i < varIndex; i++)
      {
           for (j = symTable[i].blockDepth; j > 1; j--)
@@ -238,7 +229,7 @@ void Scrie()
      int i;
      int j;
      FILE *f = fopen("symbol_table.txt", "w");
-     fprintf(f, "Au fost declarate variabilele: ");
+     fprintf(f, "Declared variables: ");
      for (i = 0; i < varIndex; i++)
      {
           for (j = symTable[i].blockDepth; j > 1; j--)
@@ -248,7 +239,7 @@ void Scrie()
           fprintf(f, "%s %s %d\n", symTable[i].symbol_type, symTable[i].symbol_name, symTable[i].Value);
      }
      fprintf(f, "\n");
-     fprintf(f, "Au fost declarate functiile: ");
+     fprintf(f, "Declared functions: ");
      for (i = 0; i < fctIndex; i++)
      {
           fprintf(f, "%s\n", symTableFct[i].signature);
@@ -260,13 +251,9 @@ int lookupFct(char *sign)
 {
      for (int i = fctIndex - 1; i >= 0; i--)
      {
-          // printf("\n");
-          // printf("in vector am %s\n",symTableFct[i].signature);
-          // printf("in argument am %s\n",sign);
-          // printf("\n");
           if (strcmp(symTableFct[i].signature, sign) == 0)
           {
-               return 1; //functia deja a fost declarata;
+               return 1; //function already declared
           }
      }
      return 0;
@@ -279,7 +266,7 @@ int insertFct()
      strcat(penru,temp);
      if(lookupFct(penru) == 1 )
      {
-          printf("  Eroare: functia cu signatura %s are un duplicat.\n",fsignature);
+          printf("  Error: function with signature %s is duplicate.\n",fsignature);
           memset(penru,0,200);
           memset(fsignature, 0, 300);
           memset(temp,0,100);
@@ -312,8 +299,6 @@ int insertIntoFsignature(char* in)
 int insertIntoNameArray(char *in)
 {
      strcpy(function_names[name_index].name, in);
-     //function_names[name_index].numberOfParams = 0;
-     //printf("Numele functiei declarate: %s \n", function_names[name_index].name);
      name_index++;
      j = 0;
      return 0;
@@ -323,16 +308,12 @@ void insertIntoParamArray(char *type)
 {
      strcpy(function_names[name_index].types[j], type);
      function_names[name_index].numberOfParams++;
-     // printf("Am inserat in %s tipurile: ", function_names[name_index].name);
-     //printf("%s \n", function_names[name_index].types[j]);
      j++;
 }
 
 void insertName(char *name)
 {
      strcpy(user_calls[curr].name, name);
-     //user_calls[curr].numberOfParams = 0;
-     //one=curr;
      curr++;
      banana = 0;
 }
@@ -340,9 +321,6 @@ void insertName(char *name)
 int insertIntoUserArray(char *type)
 {
      strcpy(user_calls[curr].types[banana], type);
-     //printf("Am inserat in user calls de %d %s tipurile: ", curr, user_calls[curr].name);
-     //printf("%s \n", user_calls[curr].types[banana]);
-     //j++;
      user_calls[curr].numberOfParams++;
      banana++;
 }
@@ -365,12 +343,9 @@ int checkIdentity(char *in)
           }
      if (ok == 0)
      {
-          printf("Functia %s nu a fost declarata anterior \n", user_calls[copie].name);
+          printf("Error: function %s hasn't been declared \n", user_calls[copie].name);
           return 2;
      }
-     //if (user_calls[copie].numberOfParams != function_names[new_copie].numberOfParams)
-          //return 0;
-     //printf("Numarul de parametri este %d si %d \n", user_calls[copie].numberOfParams, function_names[new_copie].numberOfParams);
      for (int parcurge = 0; parcurge < user_calls[copie].numberOfParams; parcurge++)
      {
           if (strcmp(user_calls[copie].types[parcurge], function_names[new_copie].types[parcurge]) != 0)
