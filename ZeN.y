@@ -11,9 +11,9 @@ extern char* yytext;
 
 %}
 %union {
-  int intVal; //valoarea
-  char* dataType; // tipul de data
-  char* strVal; //numele (id-ul)
+  int intVal; //value
+  char* dataType; // datatype
+  char* strVal; // ID
   char *key;
 }
 
@@ -30,7 +30,7 @@ extern char* yytext;
 %left MUL DIV
 %%
 
-s: progr {printf ("\n Limbajul este corect sintactic.\n"); printTable(); Scrie();}
+s: progr {printf ("\n Language is syntactically correct.\n"); printTable(); Scrie();}
 
 progr : declarations functions
 
@@ -71,7 +71,7 @@ atribute : DECL INTTYPE ID EQ NR'.' {insert($1,$2,$3,$5);}
          | FCALL  EVAL '(' exp ')'
          | FCALL ID '(' callInstructions ')'  {    insertName($2);
                                                    if (checkIdentity($2)==0)
-                                                       printf("Tipurile functiei apelate nu coincid cu tipurile functiei declarate pentru functia %s \n", $2);
+                                                       printf("The types of the called function do not match with the declared types for %s \n", $2);
                                              }
          | ODECL INTTYPE ID EQ NR'.' {insert($1, $2, $3, $5);}
          | ODECL INTTYPE ID'.'{insert($1, $2, $3, 2147483647);}
@@ -115,7 +115,7 @@ function  : DECLF INTTYPE ID    depthAdd functionBody { insertIntoFsignature($2)
           | DECLF INTTYPE EVAL '(' exp ')'
           | FCALL ID '(' callInstructions')' {    insertName($2);
                                                    if (!checkIdentity($2))
-                                                       printf("Tipurile functiei apelate nu coincid cu tipurile functiei declarate pentru functia %s \n", $2);
+                                                       printf("The types of the called function do not match with the declared types for %s \n", $2);
                                              }
           ;
 
@@ -161,10 +161,9 @@ e : e PLUS e   {$$=$1+$3; }
                                    
                               }
                               else {
-                                   printf("Variabila nu exita! \n"); 
-                                   printf("Din cauza ca ai dat ca argument la funtia Eval o variabila care nu exista acest program va crapa!\n");
-                                   printf("O zi buna!\n");
-                                   exit(1);
+                                   printf("Variable doesn't exist\n"); 
+                                   printf("Error: argument for Eval is not valid!\n");
+                                   exit(0);
                               }
                               }
   | DECL INTTYPE ID'.' { int i;
@@ -174,10 +173,9 @@ e : e PLUS e   {$$=$1+$3; }
                          }
                           else 
                           {
-                              printf("Variabila nu exita!\n"); 
-                              printf("Din cauza ca ai dat ca argument la functia Eval o variabila care nu exista acest program va crapa!\n");
-                              printf("O zi buna!\n");
-                             exit(0);
+                                   printf("Variable doesn't exist\n"); 
+                                   printf("Error: argument for Eval is not valid!\n");
+                                   exit(1);
                           }
                         }
   ;
@@ -276,7 +274,7 @@ boolOp    : BOOLEQ
 %%
 
 int yyerror(char * s){
-printf("Eroare: %s la linia:%d iar yytext este %s\n",s,yylineno,yytext);
+printf("Error: %s on line:%d and yytext is %s\n",s,yylineno,yytext);
 }
 
 int main(int argc, char** argv){
